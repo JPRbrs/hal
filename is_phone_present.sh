@@ -3,7 +3,9 @@ if [ -z $PHONE_MAC ]; then
     exit 1
 fi
 
-for i in $(arp -a | grep "$PHONE_MAC" | grep -v incomplete | awk '{print $2}' | tr -d '()'); do
-    echo "Trying $i..."
-    ping -c 1  -W 1 $i | grep '1 received' && break
+for i in $(arp-scan -I eth0 -l | grep "$PHONE_MAC" | awk '{print $1}'); do
+    ping -c 1  -W 1 $i | grep '1 received' && echo "Found at $i" && exit 0
+    
 done
+echo "Phone not found"
+exit 2
